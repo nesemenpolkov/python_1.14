@@ -124,7 +124,30 @@ class EventStore:
 
 
     def find_by_date_or_text(self, text: str = None, begin_date: datetime = None, end_date: datetime = None):
-        pass
+        assert isinstance(text, str), "String required"
+        cursor = self.__connection.cursor()
+        if not text and not begin_date and not end_date:
+            return self.get_all()
+        if text:
+            text_query = f"WHERE title LIKE '%{text}%'"
+        else:
+            text_query = ""
+        if begin_date:
+            begin_query = f"WHERE begin_date >= {begin_date.timestamp()}"
+        else:
+            begin_query = ""
+        if end_date:
+            end_query = f"WHERE end_date <= {end_date.timestamp()}"
+        else:
+            end_query = ""
+        rows = cursor.execute("SELECT events.id, title, description, begin_date, end_date, place_id, "
+                                  "lesson_type_id, classroom, unit_event_type_id from events "
+                                  "LEFT JOIN lessons ON events.id = lessons.event_id "
+                                  "LEFT JOIN unit_events ON events.id = unit_events.event_id "
+                                  f" {text_query}"
+                                  f" {begin_query}"
+                                  f" {end_query}")
+        return self.__convert_rows_to_objects(rows)
 
 
     def get_all(self):

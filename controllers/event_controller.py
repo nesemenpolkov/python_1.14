@@ -14,12 +14,32 @@ store = EventStore()
 
 @events.route(route, methods=["GET"])
 def get_all_events():
+    inform = request.args.get("event_added", False)
+    if inform:
+        return render_template("events.html", events=[event for event in store.get_all()], info="Событие добавлено!")
     return render_template("events.html", events=[event for event in store.get_all()])
 
 
 @events.route(f"{route}/search", methods=["GET"])
 def find_events():
-    pass
+    text = request.args.get("query", "")
+    try:
+        begin = datetime.fromisoformat(request.args.get("begin_date", None))
+    except TypeError:
+        begin = None
+    except ValueError:
+        begin = None
+    try:
+        end = datetime.fromisoformat(request.args.get("end_date", None))
+    except TypeError:
+        end = None
+    except ValueError:
+        end = None
+    events = store.find_by_date_or_text(text=text, begin_date=begin, end_date=end)
+    if events:
+        return render_template("events.html", events=[event for event in events])
+    else:
+        return render_template("events.html", events=[])
 
 
 @events.route(f"{route}/add", methods=["GET", "POST"])
@@ -98,6 +118,14 @@ def add_event():
 
 @events.route(f"{route}/delete", methods=["POST"])
 def delete_event():
-    pass
+    if "id" not in request.form:
+        return render_template("events.html", error="Ай Ди не указан!")
+    try:
+        event_id = request.form["id"]
+    except ValueError:
+        return render_template("events.html", error="Не верный формат Id!")
+    store.remove_event(int(event_id))
+    return render_template("events.html", events=[event for event in store.get_all()], info="Событие удалено!")
+
 
 
