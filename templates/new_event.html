@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 my-3">
+            <h3>Добавить новое событие</h3>
+        </div>
+        <div class="col-12">
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible mb-3">{{ error }}</div>
+            {% endif %}
+            <form action="/events/add" method="post">
+                <div class="form-group">
+                    <label for="eventTypeSelect">Вид события</label>
+                    <select class="form-control form-control-lg" id="eventTypeSelect" name="event_type">
+                        <option value="lesson">Учебное занятие</option>
+                        <option value="unit_event">Мероприятие подразделения</option>
+                    </select>
+                </div>
+                <div id="formGroup">
+
+                </div>
+                <template id="lessonFormGroup">
+                    <div class="form-group">
+                        <label for="title">Название дисциплины</label>
+                        <input type="text" name="title" class="form-control" id="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Описание дисциплины</label>
+                        <input type="text" name="description" class="form-control" id="description">
+                    </div>
+                    <div class="form-group">
+                        <label for="lessonType">Вид занятия</label>
+                        <select class="form-control form-control-lg" id="lessonType" name="lesson_type">
+                            <option value="lecture">Лекция</option>
+                            <option value="practical">Практическое занятие</option>
+                            <option value="seminar">Семинар</option>
+                            <option value="self_work">Самостоятельная работа</option>
+                            <option value="laboratory_work">Лабораторная работа</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="beginDate">Дата начала</label>
+                        <input type="datetime-local" name="begin_date" class="form-control" id="beginDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="classroom">Аудитория</label>
+                        <input type="text" name="classroom" class="form-control" id="classroom">
+                    </div>
+                </template>
+                <template id="unitEventFormGroup" class="mt-5">
+
+                </template>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/new-event-script.js') }}"></script>
+{% endblock %}
