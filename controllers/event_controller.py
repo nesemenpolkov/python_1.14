@@ -37,6 +37,12 @@ def add_event():
             "self_work": 4,
             "laboratory_work": 5
         }
+        unitType = {
+            "weapon": 1,
+            "sport": 2,
+            "info": 3,
+            "upbring": 4
+        }
         if event_type == "lesson":
 
             title = request.form["title"]
@@ -60,15 +66,28 @@ def add_event():
                            begin_date=begin_date,
                            classroom=classroom)
         elif event_type == "unit_event":
+            print(request.form)
             title = request.form["title"]
+            print(title)
+            if not title:
+                return render_template("new_event.html", error="Нехватает имени!")
             description = request.form["description"]
-            unit_event_type = request.form["unit_event_type"]
-            begin_date = datetime.strptime(request.form["begin_date"], "%Y-%m-%d %H:%M:%S")
-            end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%d %H:%M:%S")
-            classroom = request.form["classroom"]
+            print(description)
+            if not description:
+                return render_template("new_event.html", error="Нехватает описания!")
+            unit_event_type = request.form["unit_type"]
+            print(unit_event_type)
+            if not unit_event_type:
+                return render_template("new_event.html", error="Нехватает типа урока!")
+            try:
+                begin_date = datetime.fromisoformat(request.form["begin_date"])
+                end_date = datetime.fromisoformat(request.form["end_date"])
+            except Exception as e:
+                print(str(e))
+                return render_template("new_event.html", error="Нехватает даты!")
             event = UnitEvent(title=title,
                               description=description,
-                              unit_event_type=unit_event_type,
+                              unit_event_type=UnitEventType(unitType[unit_event_type]),
                               begin_date=begin_date,
                               end_date=end_date)
         else:
